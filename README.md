@@ -67,7 +67,20 @@ python train_and_evaluate.py  # Train & evaluate → models/, reports/
 
 ## Results
 
-After `run_pipeline.py`, metrics are in `reports/test_metrics.csv` (RMSE/MAE in **USD**; R² on **price levels**). Figures: `reports/correlation_train.png`, `reports/test_actual_vs_npb.png`, `reports/vif_final.csv`, `reports/importance_*.csv`, `reports/evaluation_summary.json`.
+Metrics below are from the **held-out test set** (`n_test` = 435; train ends `2021-10-29`, test `2021-10-30`–`2025-12-27`; see `data/processed/dataset_meta.json`). RMSE/MAE are in **USD**; R² is on **price levels**. **`vs_npb_rmse_pct`** = \((\mathrm{RMSE}_{\mathrm{NPB}} - \mathrm{RMSE}_{\mathrm{model}}) / \mathrm{RMSE}_{\mathrm{NPB}} \times 100\) — positive means lower RMSE than NPB.
+
+| Model | RMSE | MAE | R² | vs NPB (RMSE %) |
+|-------|------|-----|-----|-----------------|
+| NPB | 4.768 | 2.496 | 0.9941 | 0.0 |
+| OLS | 4.762 | 2.519 | 0.9941 | 0.12 |
+| Ridge | 4.761 | 2.518 | 0.9941 | 0.13 |
+| **Lasso** | **4.754** | 2.549 | 0.9942 | **0.29** |
+| RF | 4.763 | 2.579 | 0.9941 | 0.10 |
+| XGBoost | 4.891 | 2.791 | 0.9938 | −2.59 ·|
+
+**Takeaways (this run):** Lasso achieved the **lowest test RMSE**, about **0.29%** below NPB; OLS, Ridge, and RF show **small** gains (~0.10–0.13%). **XGBoost underperformed** NPB on RMSE (~2.6% worse). High R² is expected when `primary_Close` is in the feature set; it does not by itself imply large economic edge over persistence.
+
+**Artifacts:** `reports/test_metrics.csv`, `reports/evaluation_summary.json`, `reports/correlation_train.png`, `reports/test_actual_vs_npb.png`, `reports/vif_final.csv`, `reports/importance_*.csv`. **Linear importance files** store regression coefficients (`coef_`); Lasso often has **many exact zeros** (L1 sparsity), while Ridge/OLS keep small non-zero weights on most features. Tree models use `feature_importances_` instead.
 
 ---
 
@@ -82,7 +95,7 @@ After `run_pipeline.py`, metrics are in `reports/test_metrics.csv` (RMSE/MAE in 
 
 ## Discussion (for the report)
 
-1. **NPB is strong** — at a one-week horizon, “next week ≈ this week” is a hard baseline; ML gains are often small.  
+1. **NPB is strong** — On this split, linear models and RF only **narrowly** beat NPB on RMSE (≈0.1–0.3%); that is still far from a **15%** RMSE reduction if the proposal used that bar. XGBoost did worse than NPB here, so tree complexity did not pay off on the residual target setup.  
 2. **Data sourcing** — Cite **FRED** (with series IDs) for rates and broad market; cite **Yahoo Finance / yfinance** for individual stock and futures quotes, and note aggregation vs official exchange data.  
 3. **Reproducibility** — Fix dates and seeds in `config.py`; remote data updates over time, so re-runs may shift samples and metrics slightly.
 
