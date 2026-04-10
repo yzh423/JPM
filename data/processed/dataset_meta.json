@@ -1,0 +1,29 @@
+{
+  "n_train": 1737,
+  "n_test": 435,
+  "n_features": 15,
+  "train_index_start": "2005-03-11",
+  "train_index_end": "2021-10-29",
+  "test_index_start": "2021-10-30",
+  "test_index_end": "2025-12-27",
+  "features": [
+    "primary_ATR14",
+    "primary_vol_chg",
+    "primary_ret_1w",
+    "primary_Close",
+    "primary_Volume",
+    "ratio_yield_gold",
+    "bac_ret_1w",
+    "c_ret_1w",
+    "wfc_ret_1w",
+    "gspc_ret_1w",
+    "ftse_ret_1w",
+    "gold_ret_1w",
+    "tnx_chg",
+    "eurusd_ret",
+    "gbpusd_ret"
+  ],
+  "unscaled_columns": [
+    "primary_Close"
+  ]
+}
